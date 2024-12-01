@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+google-cloud-aiplatform
+pillow
+pydantic==1.10.8
+functions-framework==3.0.0
