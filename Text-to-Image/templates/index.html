@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f9ff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #0066cc;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+
+        /* Container */
+        .container {
+            width: 80%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Input Styles */
+        input[type="text"] {
+            width: 80%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #0066cc;
+            border-radius: 10px;
+            outline: none;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #004b8d;
+            box-shadow: 0 0 10px rgba(0, 75, 141, 0.4);
+        }
+
+        /* Button Styles */
+        button {
+            background-color: #0066cc;
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #004b8d;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #003366;
+        }
+
+        /* Image Display */
+        #output-image {
+            margin-top: 30px;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Error message */
+        .error {
+            color: red;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Generate Image from Text</h1>
+        <p>Enter a text prompt and generate an image from it</p>
+
+        <!-- Input and Button Form -->
+        <input type="text" id="prompt-input" placeholder="Enter your prompt here">
+        <br>
+        <button onclick="generateImage(event)">Generate Image</button>
+
+        <!-- Error message -->
+        <p class="error" id="error-message"></p>
+
+        <!-- Image output -->
+        <img id="output-image" src="" alt="Generated Image" style="display: none;">
+    </div>
+
+    <script>
+        // Prevent form submission and keep elements from disappearing
+        function generateImage(event) {
+            // Prevent page reload
+            event.preventDefault();
+            
+            // Get the prompt from input field
+            var prompt = document.getElementById('prompt-input').value;
+            var errorMessage = document.getElementById('error-message');
+            var outputImage = document.getElementById('output-image');
+
+            // Clear previous image and errors
+            outputImage.style.display = 'none';
+            outputImage.src = '';
+            errorMessage.textContent = '';
+
+            if (!prompt) {
+                errorMessage.textContent = 'Please enter a valid prompt.';
+                return;
+            }
+
+            // Send prompt to API
+            fetch('https://restapi-238600609590.us-central1.run.app/generate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: prompt })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.image_base64) {
+                    // Convert base64 string to image
+                    outputImage.src = 'data:image/png;base64,' + data.image_base64;
+                    outputImage.style.display = 'block';
+                    console.log(data.image_base64);  // Log the base64 string in console
+                } else {
+                    errorMessage.textContent = 'Error generating image, please try again.';
+                }
+            })
+            .catch(error => {
+                errorMessage.textContent = 'An error occurred. Please try again later.';
+                console.error(error);
+            });
+        }
+    </script>
+
+</body>
+</html>
